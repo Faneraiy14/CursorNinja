@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.pyc
+
+# PyInstaller — готові .exe публікуються в релізах, не в git
+build/
+dist/
+
+# Файли IDE
+.vscode/
+.idea/
+
+# Системні файли
+Thumbs.db
+Desktop.ini
