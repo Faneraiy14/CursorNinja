@@ -56,6 +56,10 @@ def is_down(vk):
     return (ctypes.windll.user32.GetAsyncKeyState(vk) & 0x8000) != 0
 
 
+def foreground_hwnd():
+    return ctypes.windll.user32.GetForegroundWindow()
+
+
 def seg_dist(px, py, ax, ay, bx, by):
     """Відстань від точки (px,py) до відрізка (a)-(b)."""
     dx, dy = bx - ax, by - ay
@@ -81,6 +85,11 @@ class CursorNinja:
         self.canvas = tk.Canvas(self.root, width=self.sw, height=self.sh,
                                 bg=TRANSPARENT, highlightthickness=0)
         self.canvas.pack()
+
+        # winfo_id() на Windows для toplevel-вікна повертає саме той HWND,
+        # який очікує WinAPI - потрібен для перевірки "чи оверлей зараз
+        # активне вікно" (порівнюється з foreground_hwnd() нижче).
+        self.hwnd = self.root.winfo_id()
 
         self.mx, self.my = cursor_pos()
         self.trail = []
@@ -166,7 +175,7 @@ class CursorNinja:
                     self.lives -= 1
                     self.combo = 0
                     if self.lives <= 0:
-                        self.alive = False
+                        self.end_game()
                 continue
             still.append(o)
         self.objects = still
@@ -189,6 +198,17 @@ class CursorNinja:
         if self.combo and time.time() - self.combo_time > 1.1:
             self.combo = 0
 
+    def end_game(self):
+        self.alive = False
+        # Оверлей не реагує на клік мишкою (грають самим рухом курсора),
+        # тож між раундами він міг жодного разу не бути активним вікном.
+        # Без явного грейбу фокуса тут перевірка is_foreground() нижче
+        # ніколи не була б істинною і R/Enter взагалі перестав би рестартити.
+        try:
+            self.root.focus_force()
+        except tk.TclError:
+            pass
+
     def slice_object(self, o):
         o["sliced"] = True
         if o["bomb"]:
@@ -197,7 +217,7 @@ class CursorNinja:
             self.spawn_particles(o["x"], o["y"], "#FF5252", 22)
             self.spawn_particles(o["x"], o["y"], "#FFCA28", 14)
             if self.lives <= 0:
-                self.alive = False
+                self.end_game()
             return
         self.combo += 1
         self.combo_time = time.time()
@@ -312,7 +332,13 @@ class CursorNinja:
         else:
             # оновлюємо позицію мишки, щоб не було стрибка після рестарту
             self.mx, self.my = cursor_pos()
-            if is_down(VK_R) or is_down(VK_ENTER):
+            # R/Enter лишаються глобальними (як і слайсинг), але, на відміну
+            # від ESC, це поширені клавіші під час звичайного набору тексту -
+            # end_game() грейбить фокус на оверлей саме в момент програшу,
+            # тож ця перевірка відсікає натискання в ІНШИХ вікнах, куди
+            # користувач перемкнувся після завершення раунду (напр. Enter
+            # для відправки повідомлення в чаті).
+            if (is_down(VK_R) or is_down(VK_ENTER)) and foreground_hwnd() == self.hwnd:
                 self.reset()
 
         self.draw()
