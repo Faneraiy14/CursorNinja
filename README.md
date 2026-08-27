@@ -1,55 +1,58 @@
 # Cursor Ninja
 
-Fruit Ninja на робочому столі — курсор миші замінює лезо. Швидко проведи
-мишкою крізь фрукт, щоб розрізати його. Бомби краще не чіпати.
+*[Українською](README.uk.md)*
+
+Fruit Ninja on your desktop — the mouse cursor is the blade. Swipe the mouse
+quickly through a fruit to slice it. Better leave the bombs alone.
 
 ![Windows](https://img.shields.io/badge/Windows-10%2F11-0078d4)
 ![Python](https://img.shields.io/badge/Python-3-3776ab)
-![Залежності](https://img.shields.io/badge/залежності-немає-2ecc71)
+![Dependencies](https://img.shields.io/badge/dependencies-none-2ecc71)
 
-## Дві версії
+## Two versions
 
-| Файл | Що це | Коли використовувати |
+| File | What it is | When to use it |
 |---|---|---|
-| `cursor_ninja.py` | прозорий оверлей поверх **усіх** вікон екрана | пограти самому: різати фрукти будь-де на робочому столі |
-| `cursor_ninja_bg.py` | звичайне вікно з намальованим нічним фоном | скомпілювати `.exe` й надіслати другу — саме її зібрано в релізі |
+| `cursor_ninja.py` | a transparent overlay on top of **all** windows on screen | to play yourself: slice fruit anywhere on the desktop |
+| `cursor_ninja_bg.py` | a regular window with a drawn night-sky background | for building an `.exe` to send to a friend — this is the one built into the release |
 
-Логіка гри однакова в обох — різниця лише в тому, чи гра займає весь екран
-прозорим шаром, чи живе в звичайному вікні.
+The game logic is identical in both — the only difference is whether the
+game occupies the whole screen as a transparent layer, or lives in a
+regular window.
 
-## Як грати
+## How to play
 
-- **Води мишкою** швидко крізь фрукти — це і є розрізання.
-- **Бомбу 💣 не чіпай** — забере життя, як і пропущений фрукт.
-- Кілька розрізів підряд — **комбо**, дає більше очок.
-- `R` або `Enter` — заново після програшу.
-- `Esc` — вийти.
+- **Swipe the mouse** quickly through the fruit — that's the slice.
+- **Leave the bomb 💣 alone** — it costs you a life, same as a missed fruit.
+- Several slices in a row make a **combo**, worth more points.
+- `R` or `Enter` — restart after losing.
+- `Esc` — quit.
 
-## Запуск
+## Running it
 
-Готовий `.exe` — на сторінці [Releases](../../releases). Нічого встановлювати
-не треба, просто запустити.
+A ready-made `.exe` is on the [Releases](../../releases) page. Nothing to
+install, just run it.
 
-> Windows може показати «Windows захистила ваш ПК» — файл не підписаний
-> платним сертифікатом. «Докладніше» → «Виконати все одно».
+> Windows may show "Windows protected your PC" — the file isn't signed
+> with a paid certificate. "More info" → "Run anyway".
 
-З вихідного коду:
+From source:
 
 ```
-python cursor_ninja_bg.py      # у вікні
-python cursor_ninja.py         # оверлей поверх усіх вікон
+python cursor_ninja_bg.py      # windowed
+python cursor_ninja.py         # overlay on top of all windows
 ```
 
-Потрібен лише Python 3 під Windows. Сторонніх бібліотек немає — `tkinter`,
-`ctypes`, `random`, `math`, `time` входять у стандартну поставку.
+Needs only Python 3 on Windows. No third-party libraries — `tkinter`,
+`ctypes`, `random`, `math`, `time` are all in the standard library.
 
-## Зібрати самому
+## Building it yourself
 
 ```
 pyinstaller CursorNinja.spec
 ```
 
-## Чому Windows
+## Why Windows
 
-`ctypes.windll.user32` (читання позиції курсора та клавіш) — це WinAPI,
-працює лише на Windows. Сама гра на `tkinter` кросплатформна.
+`ctypes.windll.user32` (reading cursor position and keys) is WinAPI,
+Windows-only. The game itself, built on `tkinter`, is cross-platform.
